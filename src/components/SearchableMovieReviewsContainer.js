@@ -4,21 +4,25 @@ import MovieReviews from './MovieReviews'
 
 const NYT_API_KEY = 'ZGkEAm9fha8AdC9FzAYlM02wv3AGYgcT';
 const URL = 'https://api.nytimes.com/svc/movies/v2/reviews/search.json?'
-            + `api-key=${NYT_API_KEY}`;
+            + `api-key=${NYT_API_KEY}&query=`;
 
 
 class SearchableMovieReviewsContainer extends Component {
     state = {
-        reviews = [],
+        reviews: [],
         searchTerm: ''
     }
 
     handleSubmit = (event) => {
-        //finish
+        event.preventDefault()
+
+        fetch(URL + `${this.state.searchTerm}`)
+            .then(res => res.json())
+            .then(data => this.setState({reviews: data.results}))
     }
 
     handleSearchInput = (event) => {
-        //finish
+        this.setState({ searchTerm: event.target.value })
     }
 
     render() {
@@ -26,10 +30,17 @@ class SearchableMovieReviewsContainer extends Component {
             <div className='searchable-movie-reviews'>
                 <form onSubmit={this.handleSubmit}>
                     <label htmlFor="search-input">Enter search term:</label>
-                    <input type="text" id='search-input' onChange={this.handleSearchInput}>
-                        <button type='submit'>Submit</button>
-                    </input>
+                    <input
+                        id="search-input"
+                        type="text"
+                        style={{ width: 300 }}
+                        onChange={this.handleSearchInput}
+                        value={this.state.searchTerm}
+                    />
                 </form>
+                {typeof this.state.reviews === 'object' &&
+                     this.state.reviews.length > 0 && <h2>Movie Review By Search:</h2>}
+                <MovieReviews reviews={this.state.reviews} />
             </div>
         );
     }
